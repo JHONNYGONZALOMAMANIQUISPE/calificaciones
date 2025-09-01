@@ -2,144 +2,178 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Notas de Estudiantes</title>
-  <script src="https://cdn.jsdelivr.net/npm/tailwindcss-jit-cdn"></script>
-  <script>
-    tailwind.config = { theme: { extend: {} } }
-  </script>
+  <title>Gestión de Calificaciones</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-
-  <div class="w-full max-w-lg bg-white shadow-2xl rounded-2xl p-6 space-y-4">
-    <h1 class="text-2xl font-bold text-center text-indigo-600">Sistema de Calificaciones</h1>
+  <div class="bg-white shadow-xl rounded-xl p-6 w-full max-w-6xl">
+    <h1 class="text-2xl font-bold mb-4 text-center">Gestión de Calificaciones</h1>
 
     <!-- Login -->
-    <div id="loginSection" class="space-y-3">
-      <label class="block">
-        <span class="text-gray-700">Ingrese su código:</span>
-        <input id="codigoInput" type="text" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2" placeholder="Ej: STU123 o ADMIN123">
-      </label>
-      <button onclick="login()" class="w-full bg-indigo-600 text-white py-2 rounded-lg shadow hover:bg-indigo-700">Ingresar</button>
-      <p id="loginError" class="text-red-500 text-sm text-center hidden">Código incorrecto</p>
+    <div id="loginDiv" class="text-center">
+      <p class="mb-2">Ingrese su código:</p>
+      <input type="text" id="codigoInput" class="border px-2 py-1 rounded" placeholder="Ej: STU123 o ADMIN">
+      <button onclick="login()" class="bg-blue-500 text-white px-4 py-1 rounded ml-2">Ingresar</button>
     </div>
 
     <!-- Panel estudiante -->
-    <div id="studentSection" class="hidden space-y-4">
-      <h2 class="text-xl font-semibold text-gray-700">Bienvenido, <span id="studentName"></span></h2>
-      <table class="w-full border rounded-lg">
+    <div id="estudianteDiv" class="hidden">
+      <h2 class="text-xl font-bold mb-4 text-center">Notas del Estudiante</h2>
+      <div id="infoEstudiante" class="mb-4 font-semibold"></div>
+      <table class="w-full border text-center" id="tablaEstudiante">
         <thead>
-          <tr class="bg-indigo-100">
-            <th class="p-2 text-left">Materia</th>
-            <th class="p-2 text-left">Nota</th>
+          <tr class="bg-gray-200">
+            <th class="border px-2 py-1">Sección</th>
+            <th class="border px-2 py-1">Notas</th>
+            <th class="border px-2 py-1">Promedio</th>
           </tr>
         </thead>
-        <tbody id="gradesTable" class="divide-y"></tbody>
+        <tbody id="tablaNotasEstudiante"></tbody>
       </table>
-      <p class="font-semibold text-gray-700">Promedio: <span id="average"></span></p>
-      <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Salir</button>
+      <p class="mt-4 font-bold text-lg">Promedio General: <span id="promGeneralEst">-</span></p>
     </div>
 
     <!-- Panel administrador -->
-    <div id="adminSection" class="hidden space-y-4">
-      <h2 class="text-xl font-semibold text-gray-700">Panel del Docente</h2>
+    <div id="adminDiv" class="hidden">
+      <h2 class="text-xl font-bold mb-4 text-center">Panel del Administrador</h2>
       
-      <!-- Formulario agregar estudiante -->
-      <div class="p-4 bg-gray-50 rounded-lg shadow-inner space-y-2">
-        <h3 class="font-semibold">Registrar/Actualizar Estudiante</h3>
-        <input id="codigoEstudiante" type="text" placeholder="Código (ej: STU123)" class="w-full p-2 rounded border">
-        <input id="nombreEstudiante" type="text" placeholder="Nombre del estudiante" class="w-full p-2 rounded border">
-        <input id="materia" type="text" placeholder="Materia (ej: Matemática)" class="w-full p-2 rounded border">
-        <input id="nota" type="number" placeholder="Nota (0-100)" class="w-full p-2 rounded border">
-        <button onclick="guardarNota()" class="bg-green-600 text-white px-4 py-2 rounded-lg w-full">Guardar Nota</button>
+      <!-- Selección estudiante -->
+      <div class="mb-4">
+        <label for="selEstudiante" class="mr-2 font-semibold">Seleccionar Estudiante:</label>
+        <select id="selEstudiante" class="border px-2 py-1 rounded"></select>
       </div>
 
-      <!-- Tabla de estudiantes -->
-      <div>
-        <h3 class="font-semibold">Lista de estudiantes registrados</h3>
-        <ul id="studentsList" class="list-disc list-inside text-gray-700"></ul>
+      <!-- Agregar nota -->
+      <div class="mb-4">
+        <label for="selSeccion" class="mr-2 font-semibold">Sección:</label>
+        <select id="selSeccion" class="border px-2 py-1 rounded">
+          <option value="SER">SER</option>
+          <option value="SABER">SABER</option>
+          <option value="HACER">HACER</option>
+          <option value="DECIDIR">DECIDIR</option>
+        </select>
+        <input type="number" id="notaInput" class="border px-2 py-1 rounded ml-2 w-20" placeholder="Nota">
+        <button onclick="agregarNota()" class="bg-green-500 text-white px-4 py-1 rounded ml-2">Agregar Nota</button>
       </div>
 
-      <button onclick="logout()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Salir</button>
+      <!-- Tabla administrador -->
+      <table class="w-full border text-center" id="tablaAdmin">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border px-2 py-1">Código</th>
+            <th class="border px-2 py-1">Nombre</th>
+            <th class="border px-2 py-1">SER</th>
+            <th class="border px-2 py-1">SABER</th>
+            <th class="border px-2 py-1">HACER</th>
+            <th class="border px-2 py-1">DECIDIR</th>
+            <th class="border px-2 py-1">Promedio General</th>
+          </tr>
+        </thead>
+        <tbody id="tablaNotasAdmin"></tbody>
+      </table>
     </div>
   </div>
 
-  <script>
-    // Cargar datos desde LocalStorage
-    let estudiantes = JSON.parse(localStorage.getItem("estudiantes")) || {};
+<script>
+const adminCode = "ADMIN";
+let usuarioActual = null;
 
-    function login() {
-      const codigo = document.getElementById("codigoInput").value.trim();
-      if (codigo === "ADMIN123") {
-        document.getElementById("loginSection").classList.add("hidden");
-        document.getElementById("adminSection").classList.remove("hidden");
-        actualizarLista();
-      } else if (estudiantes[codigo]) {
-        mostrarNotas(codigo);
-        document.getElementById("loginSection").classList.add("hidden");
-        document.getElementById("studentSection").classList.remove("hidden");
-      } else {
-        document.getElementById("loginError").classList.remove("hidden");
-      }
+// Base de datos simulada
+const estudiantes = {
+  "STU123": {nombre: "Ana Pérez", notas: {SER: [80], SABER: [90], HACER: [70], DECIDIR: [85]}},
+  "STU456": {nombre: "Carlos Gómez", notas: {SER: [60, 75], SABER: [70], HACER: [80], DECIDIR: [65]}},
+  "STU789": {nombre: "María López", notas: {SER: [95], SABER: [88], HACER: [92], DECIDIR: [90]}},
+};
+
+// Función para promediar
+function promedio(arr) {
+  if (!arr || arr.length === 0) return 0;
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+// Login
+function login() {
+  const codigo = document.getElementById("codigoInput").value.trim();
+  if (codigo === adminCode) {
+    usuarioActual = "ADMIN";
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("adminDiv").classList.remove("hidden");
+    cargarSelectEstudiantes();
+    renderTablaAdmin();
+  } else if (estudiantes[codigo]) {
+    usuarioActual = codigo;
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("estudianteDiv").classList.remove("hidden");
+    renderTablaEstudiante();
+  } else {
+    alert("Código no válido.");
+  }
+}
+
+// Render tabla estudiante
+function renderTablaEstudiante() {
+  const est = estudiantes[usuarioActual];
+  document.getElementById("infoEstudiante").innerText = `${usuarioActual} - ${est.nombre}`;
+  const tbody = document.getElementById("tablaNotasEstudiante");
+  tbody.innerHTML = "";
+  let promGeneral = 0, count = 0;
+  for (let sec of ["SER", "SABER", "HACER", "DECIDIR"]) {
+    let prom = promedio(est.notas[sec]);
+    promGeneral += prom;
+    count++;
+    tbody.innerHTML += `
+      <tr>
+        <td class="border px-2 py-1 font-semibold">${sec}</td>
+        <td class="border px-2 py-1">${est.notas[sec].join(", ")}</td>
+        <td class="border px-2 py-1">${prom.toFixed(2)}</td>
+      </tr>
+    `;
+  }
+  document.getElementById("promGeneralEst").innerText = (promGeneral / count).toFixed(2);
+}
+
+// Render tabla administrador
+function renderTablaAdmin() {
+  const tbody = document.getElementById("tablaNotasAdmin");
+  tbody.innerHTML = "";
+  for (let codigo in estudiantes) {
+    let est = estudiantes[codigo];
+    let promGeneral = 0, count = 0;
+    let fila = `<tr>
+      <td class="border px-2 py-1">${codigo}</td>
+      <td class="border px-2 py-1">${est.nombre}</td>`;
+    for (let sec of ["SER", "SABER", "HACER", "DECIDIR"]) {
+      let prom = promedio(est.notas[sec]);
+      promGeneral += prom; count++;
+      fila += `<td class="border px-2 py-1">${prom.toFixed(2)}</td>`;
     }
+    fila += `<td class="border px-2 py-1 font-bold">${(promGeneral / count).toFixed(2)}</td></tr>`;
+    tbody.innerHTML += fila;
+  }
+}
 
-    function logout() {
-      document.getElementById("codigoInput").value = "";
-      document.getElementById("loginSection").classList.remove("hidden");
-      document.getElementById("studentSection").classList.add("hidden");
-      document.getElementById("adminSection").classList.add("hidden");
-      document.getElementById("loginError").classList.add("hidden");
-    }
+// Cargar estudiantes en select
+function cargarSelectEstudiantes() {
+  const sel = document.getElementById("selEstudiante");
+  sel.innerHTML = "";
+  for (let codigo in estudiantes) {
+    sel.innerHTML += `<option value="${codigo}">${codigo} - ${estudiantes[codigo].nombre}</option>`;
+  }
+}
 
-    function guardarNota() {
-      const codigo = document.getElementById("codigoEstudiante").value.trim();
-      const nombre = document.getElementById("nombreEstudiante").value.trim();
-      const materia = document.getElementById("materia").value.trim();
-      const nota = parseFloat(document.getElementById("nota").value);
-
-      if (!codigo || !nombre || !materia || isNaN(nota)) {
-        alert("Complete todos los campos");
-        return;
-      }
-
-      if (!estudiantes[codigo]) {
-        estudiantes[codigo] = {nombre: nombre, notas: {}};
-      } else {
-        estudiantes[codigo].nombre = nombre;
-      }
-
-      estudiantes[codigo].notas[materia] = nota;
-      localStorage.setItem("estudiantes", JSON.stringify(estudiantes));
-      actualizarLista();
-      alert("Nota guardada correctamente");
-    }
-
-    function mostrarNotas(codigo) {
-      const estudiante = estudiantes[codigo];
-      document.getElementById("studentName").textContent = estudiante.nombre;
-      const tabla = document.getElementById("gradesTable");
-      tabla.innerHTML = "";
-
-      let suma = 0;
-      let count = 0;
-      for (const [materia, nota] of Object.entries(estudiante.notas)) {
-        let fila = `<tr><td class="p-2">${materia}</td><td class="p-2">${nota}</td></tr>`;
-        tabla.innerHTML += fila;
-        suma += nota;
-        count++;
-      }
-      const promedio = count > 0 ? (suma / count).toFixed(2) : "Sin notas";
-      document.getElementById("average").textContent = promedio;
-    }
-
-    function actualizarLista() {
-      const lista = document.getElementById("studentsList");
-      lista.innerHTML = "";
-      for (const [codigo, data] of Object.entries(estudiantes)) {
-        const li = document.createElement("li");
-        li.textContent = `${codigo} - ${data.nombre}`;
-        lista.appendChild(li);
-      }
-    }
-  </script>
+// Agregar nota desde admin
+function agregarNota() {
+  const codigo = document.getElementById("selEstudiante").value;
+  const seccion = document.getElementById("selSeccion").value;
+  const nota = parseFloat(document.getElementById("notaInput").value);
+  if (isNaN(nota)) { alert("Ingrese una nota válida"); return; }
+  estudiantes[codigo].notas[seccion].push(nota);
+  renderTablaAdmin();
+  if (usuarioActual !== "ADMIN" && usuarioActual === codigo) {
+    renderTablaEstudiante();
+  }
+  document.getElementById("notaInput").value = "";
+}
+</script>
 </body>
 </html>
